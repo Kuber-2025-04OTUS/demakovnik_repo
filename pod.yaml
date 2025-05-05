@@ -24,6 +24,10 @@ spec:
     volumeMounts:
     - name: webdir
       mountPath: /homework
+    lifecycle:
+        preStop:
+          exec:
+            command: ["/bin/sh", "-c", "rm -f /homework/index.html"]
   volumes:
     - name: webdir
       emptyDir: {}
