@@ -6,7 +6,7 @@ metadata:
   labels:
     homework: kubernetes-controllers
 spec:
-  replicas: 2
+  replicas: 3
   strategy:
     type: RollingUpdate
     rollingUpdate:
@@ -20,6 +20,8 @@ spec:
       labels:
         homework: kubernetes-controllers
     spec:
+      nodeSelector:            # Добавляем выбор нод по метке
+        homework: "true"      # Поды будут запускаться только на нодах с homework=true
       initContainers:
         - name: init
           image: busybox:1.36 
@@ -31,7 +33,7 @@ spec:
               mountPath: /init  
       containers:
       - name: web-server
-        image: nginx:1.27.5
+        image: nginx:1.27.2
         ports:
         - containerPort: 8000
         command: ["/bin/sh", "-c"]
@@ -44,15 +46,12 @@ spec:
             preStop:
               exec:
                 command: ["/bin/sh", "-c", "rm -f /homework/index.html"]
-        readinessProbe:
-          httpGet:
-            path: /
-            port: 8000
-          initialDelaySeconds: 5  # Задержка перед первой проверкой (секунды)
-          periodSeconds: 10       # Интервал между проверками (секунды)
-          timeoutSeconds: 2       # Таймаут ожидания ответа (секунды)
-          successThreshold: 1    # Количество успешных проверок для "готовности"
-          failureThreshold: 3     # Количество неудачных проверок для "неготовности"
+        readinessProbe:          # Добавляем проверку наличия файла
+          exec:
+            command: ["/bin/sh", "-c", "test -f /homework/index.html"]
+          initialDelaySeconds: 5  # Задержка перед первой проверкой
+          periodSeconds: 5        # Проверка каждые 5 секунд
+          failureThreshold: 3     # После 3 неудачных проверок под считается "не готов"
       volumes:
         - name: webdir
           emptyDir: {}
