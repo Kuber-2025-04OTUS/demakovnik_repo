@@ -7,6 +7,11 @@ metadata:
     homework: kubernetes-controllers
 spec:
   replicas: 2
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 1  # Максимум 1 под может быть недоступен
+      maxSurge: 1        # Максимум 1 под может быть создан сверх replicas
   selector:
     matchLabels:
       homework: kubernetes-controllers
