@@ -1,0 +1,18 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: homework-ingress
+  namespace: homework
+spec:
+  ingressClassName: nginx  # Указываем класс Ingress (если используется)
+  rules:
+  - host: homework.otus    # Ваш хост
+    http:
+      paths:
+      - path: /            # Ловим все запросы (включая /homepage)
+        pathType: Prefix
+        backend:
+          service:
+            name: homework-service  # Сервис, который направляет трафик в Pod с Nginx
+            port:
+              number: 80            # Порт сервиса (обычно 80 или 8000)
