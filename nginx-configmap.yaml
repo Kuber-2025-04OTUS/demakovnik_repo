@@ -6,22 +6,31 @@ metadata:
 data:
   default.conf: |
     server {
-      listen 8000;
-      server_name localhost;
+        listen 8000;
+        server_name homework.otus;
+        root /homework;
 
-      location / {
-          root /homework;
-          index index.html index.htm;
-      }
+        # Обработка корня
+        location = / {
+            try_files /index.html =404;
+        }
 
-      # Редирект с /homepage на /
-      location = /homepage {
-          return 301 /;
-      }
+        # Обработка index.html
+        location = /index.html {
+            try_files /index.html =404;
+        }
 
-      error_page 500 502 503 504 /50x.html;
-      location = /50x.html {
-          root /homework;
-      }
+        # Редирект homepage
+        location = /homepage {
+            return 301 /;
+        }
+
+        # Все остальные пути
+        location / {
+            return 404;
+        }
+
+        error_page 404 /404.html;
+        error_page 500 502 503 504 /50x.html;
     }
 
