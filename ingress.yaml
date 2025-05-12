@@ -4,15 +4,15 @@ metadata:
   name: homework-ingress
   namespace: homework
 spec:
-  ingressClassName: nginx  # Указываем класс Ingress (если используется)
+  ingressClassName: nginx  
   rules:
-  - host: homework.otus    # Ваш хост
+  - host: homework.otus    
     http:
       paths:
-      - path: /            # Ловим все запросы (включая /homepage)
+      - path: /            
         pathType: Prefix
         backend:
           service:
-            name: homework-service  # Сервис, который направляет трафик в Pod с Nginx
+            name: homework-service  
             port:
-              number: 80            # Порт сервиса (обычно 80 или 8000)
+              number: 80            
