@@ -12,21 +12,7 @@ spec:
   - host: homework.otus
     http:
       paths:
-      - path: /(homepage)
-        pathType: ImplementationSpecific
-        backend:
-          service:
-            name: homework-service
-            port:
-              number: 80
-      - path: /(index\.html)
-        pathType: ImplementationSpecific
-        backend:
-          service:
-            name: homework-service
-            port:
-              number: 80
-      - path: /(^/|$)
+      - path: /(homepage|index\.html|^/|$)
         pathType: ImplementationSpecific
         backend:
           service:
