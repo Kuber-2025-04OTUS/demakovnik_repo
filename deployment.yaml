@@ -2,57 +2,64 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   namespace: homework
-  name: kubernetes-controllers
+  name: kubernetes-networks
   labels:
-    homework: kubernetes-controllers
+    homework: kubernetes-networks
 spec:
   replicas: 3
   strategy:
     type: RollingUpdate
     rollingUpdate:
-      maxUnavailable: 1  # Максимум 1 под может быть недоступен
-      maxSurge: 1        # Максимум 1 под может быть создан сверх replicas
+      maxUnavailable: 1
+      maxSurge: 1
   selector:
     matchLabels:
-      homework: kubernetes-controllers
+      homework: kubernetes-networks
   template:
     metadata:
       labels:
-        homework: kubernetes-controllers
+        homework: kubernetes-networks
     spec:
-      nodeSelector:            # Добавляем выбор нод по метке
-        homework: "true"      # Поды будут запускаться только на нодах с homework=true
-      initContainers:
-        - name: init
-          image: busybox:1.36 
-          command: ["/bin/sh", "-c"]
-          args:
-            - "echo 'Homework 2' > /init/index.html"
-          volumeMounts:
-            - name: webdir
-              mountPath: /init  
+      nodeSelector:
+        homework: "true"
       containers:
       - name: web-server
         image: nginx:1.27.2
         ports:
         - containerPort: 8000
+          name: http-web-svc
         command: ["/bin/sh", "-c"]
         args:
-          - "sed -i 's/listen       80;/listen 8000;/g' /etc/nginx/conf.d/default.conf; sed -i 's|root   /usr/share/nginx/html;|root /homework;|g' /etc/nginx/conf.d/default.conf; exec nginx -g 'daemon off;'"
+          - "exec nginx -g 'daemon off;'"
         volumeMounts:
+        - name: nginx-config
+          mountPath: /etc/nginx/conf.d/default.conf
+          subPath: default.conf
         - name: webdir
           mountPath: /homework
         lifecycle:
-            preStop:
-              exec:
-                command: ["/bin/sh", "-c", "rm -f /homework/index.html"]
-        readinessProbe:          # Добавляем проверку наличия файла
-          exec:
-            command: ["/bin/sh", "-c", "test -f /homework/index.html"]
-          initialDelaySeconds: 5  # Задержка перед первой проверкой
-          periodSeconds: 5        # Проверка каждые 5 секунд
-          failureThreshold: 3     # После 3 неудачных проверок под считается "не готов"
-      volumes:
+          preStop:
+            exec:
+              command: ["/bin/sh", "-c", "rm -f /homework/index.html"]
+        readinessProbe:
+          httpGet:
+            path: /index.html
+            port: 8000
+          initialDelaySeconds: 10
+          periodSeconds: 10
+          failureThreshold: 2
+      initContainers:
+      - name: init
+        image: busybox:1.36
+        command: ["/bin/sh", "-c"]
+        args:
+          - "echo \"Homework 3. Hostname: $(hostname)\" > /init/index.html"
+        volumeMounts:
         - name: webdir
-          emptyDir: {}
-  
+          mountPath: /init
+      volumes:
+      - name: nginx-config
+        configMap:
+          name: nginx-config
+      - name: webdir
+        emptyDir: {}
