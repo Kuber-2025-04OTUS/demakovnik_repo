@@ -37,6 +37,9 @@ spec:
           subPath: default.conf
         - name: webdir
           mountPath: /homework
+        - name: homework-config
+          mountPath: /homework/config
+          subPath: config
         lifecycle:
           preStop:
             exec:
@@ -60,6 +63,11 @@ spec:
       volumes:
       - name: nginx-config
         configMap:
-          name: nginx-config
+          name: configmap-homework
+      - name: homework-config
+        configMap:
+          name: configmap-homework
       - name: webdir
-        emptyDir: {}
+        persistentVolumeClaim:
+          claimName: pvc-homework  # Указываем имя существующего PVC
+      
