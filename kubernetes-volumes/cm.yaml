@@ -20,36 +20,38 @@ data:
   # Ключ с именем файла (значение будет аналогично файлу)
   default.conf: |
     server {
-        listen 8000;
-        server_name homework.otus;
-        root /homework;
+      listen 8000;
+      server_name homework.otus;
+      root /homework;
 
-        # Обработка корня
-        location = / {
-            try_files /index.html =404;
-        }
+      # Обработка корня
+      location = / {
+          try_files /index.html =404;
+      }
 
-        location = /conf/file {
-            try_files /config =404;
-        }
+      location = /conf/file {
+        default_type text/plain;
+        add_header Content-Type text/plain;
+        try_files /config =404;
+      }
 
-        # Обработка index.html
-        location = /index.html {
-            try_files /index.html =404;
-        }
+      # Обработка index.html
+      location = /index.html {
+          try_files /index.html =404;
+      }
 
-        # Редирект homepage
-        location = /homepage {
-            return 301 /;
-        }
+      # Редирект homepage
+      location = /homepage {
+          return 301 /;
+      }
 
-        # Все остальные пути
-        location / {
-            return 404;
-        }
+      # Все остальные пути
+      location / {
+          return 404;
+      }
 
-        error_page 404 /404.html;
-        error_page 500 502 503 504 /50x.html;
+      error_page 404 /404.html;
+      error_page 500 502 503 504 /50x.html;
     }
   config: |
     myconfig data ....
