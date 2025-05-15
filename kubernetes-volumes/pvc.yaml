@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: pvc-homework  # Название PVC
+  namespace: homework
+spec:
+  accessModes:
+    - ReadWriteOnce  # Режим доступа (может быть ReadOnlyMany, ReadWriteMany)
+  resources:
+    requests:
+      storage: 1Gi  # Запрашиваемый объём (1 гигабайт)
+  storageClassName: rke-hostpath-retain

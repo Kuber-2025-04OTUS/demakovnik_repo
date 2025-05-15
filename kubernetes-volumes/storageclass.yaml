@@ -1,0 +1,10 @@
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: rke-hostpath-retain
+  namespace: homework
+  annotations:
+    storageclass.kubernetes.io/is-default-class: "false"  # Не делать default (можно изменить на "true")
+provisioner: driver.longhorn.io  # Используем рекомендуемый provisioner longhorn, так как у меня поднят кластер rke2
+reclaimPolicy: Retain  # Тома не удаляются автоматически после удаления PVC
+volumeBindingMode: Immediate  # Том создаётся сразу при создании PVC
