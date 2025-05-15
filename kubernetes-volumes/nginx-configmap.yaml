@@ -1,0 +1,36 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: nginx-config
+  namespace: homework
+data:
+  default.conf: |
+    server {
+        listen 8000;
+        server_name homework.otus;
+        root /homework;
+
+        # Обработка корня
+        location = / {
+            try_files /index.html =404;
+        }
+
+        # Обработка index.html
+        location = /index.html {
+            try_files /index.html =404;
+        }
+
+        # Редирект homepage
+        location = /homepage {
+            return 301 /;
+        }
+
+        # Все остальные пути
+        location / {
+            return 404;
+        }
+
+        error_page 404 /404.html;
+        error_page 500 502 503 504 /50x.html;
+    }
+
