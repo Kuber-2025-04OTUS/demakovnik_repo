@@ -2,7 +2,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: configmap-homework  # Название ConfigMap
-  namespace: homework       # Необязательно (если не указан, используется default)
+  namespace: homework       
 data:
   # Произвольные пары ключ-значение в формате строк
   APP_COLOR: "blue"
