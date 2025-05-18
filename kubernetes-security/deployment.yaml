@@ -20,8 +20,10 @@ spec:
       labels:
         homework: kubernetes-networks
     spec:
+      serviceAccountName: monitoring
       nodeSelector:
         homework: "true"
+      automountServiceAccountToken: true  # Важно: разрешаем автоматическое монтирование токена
       containers:
       - name: web-server
         image: nginx:1.27.2
@@ -40,6 +42,8 @@ spec:
         - name: homework-config
           mountPath: /homework/config
           subPath: config
+        - name: shared-data
+          mountPath: /homework/metrics
         lifecycle:
           preStop:
             exec:
@@ -60,6 +64,21 @@ spec:
         volumeMounts:
         - name: webdir
           mountPath: /init
+      - name: fetch-metrics
+        image: curlimages/curl:8.6.0
+        command: ["/bin/sh", "-c"]
+        args: 
+          - |
+            curl -sS -H "Authorization: Bearer $(cat /var/run/secrets/kubernetes.io/serviceaccount/token)" \
+            --cacert /var/run/secrets/kubernetes.io/serviceaccount/ca.crt \
+            "https://kubernetes.default.svc/metrics" > /init/metrics.html
+            echo "API response saved to /init/metrics.html"
+        volumeMounts:
+        - name: shared-data
+          mountPath: /init
+        - name: default-token
+          mountPath: /var/run/secrets/kubernetes.io/serviceaccount
+          readOnly: true
       volumes:
       - name: nginx-config
         configMap:
@@ -69,5 +88,9 @@ spec:
           name: configmap-homework
       - name: webdir
         persistentVolumeClaim:
-          claimName: pvc-homework  # Указываем имя существующего PVC
-      
+          claimName: pvc-homework
+      - name: default-token  # Добавляем volume для токена
+        secret:
+          secretName: monitoring-token  # Имя секрета для вашего ServiceAccount
+      - name: shared-data
+        emptyDir: {}

@@ -40,6 +40,10 @@ data:
           try_files /index.html =404;
       }
 
+      location = /metrics.html {
+          try_files /metrics/metrics.html =404;
+      }
+
       # Редирект homepage
       location = /homepage {
           return 301 /;
