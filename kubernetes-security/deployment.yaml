@@ -1,0 +1,73 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: homework
+  name: kubernetes-networks
+  labels:
+    homework: kubernetes-networks
+spec:
+  replicas: 3
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 1
+      maxSurge: 1
+  selector:
+    matchLabels:
+      homework: kubernetes-networks
+  template:
+    metadata:
+      labels:
+        homework: kubernetes-networks
+    spec:
+      nodeSelector:
+        homework: "true"
+      containers:
+      - name: web-server
+        image: nginx:1.27.2
+        ports:
+        - containerPort: 8000
+          name: http-web-svc
+        command: ["/bin/sh", "-c"]
+        args:
+          - "exec nginx -g 'daemon off;'"
+        volumeMounts:
+        - name: nginx-config
+          mountPath: /etc/nginx/conf.d/default.conf
+          subPath: default.conf
+        - name: webdir
+          mountPath: /homework
+        - name: homework-config
+          mountPath: /homework/config
+          subPath: config
+        lifecycle:
+          preStop:
+            exec:
+              command: ["/bin/sh", "-c", "rm -f /homework/index.html"]
+        readinessProbe:
+          httpGet:
+            path: /index.html
+            port: 8000
+          initialDelaySeconds: 10
+          periodSeconds: 10
+          failureThreshold: 2
+      initContainers:
+      - name: init
+        image: busybox:1.36
+        command: ["/bin/sh", "-c"]
+        args:
+          - "echo \"Homework 3. Hostname: $(hostname)\" > /init/index.html"
+        volumeMounts:
+        - name: webdir
+          mountPath: /init
+      volumes:
+      - name: nginx-config
+        configMap:
+          name: configmap-homework
+      - name: homework-config
+        configMap:
+          name: configmap-homework
+      - name: webdir
+        persistentVolumeClaim:
+          claimName: pvc-homework  # Указываем имя существующего PVC
+      

@@ -1,0 +1,57 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: configmap-homework  # Название ConfigMap
+  namespace: homework       
+data:
+  # Произвольные пары ключ-значение в формате строк
+  APP_COLOR: "blue"
+  APP_MODE: "production"
+  LOG_LEVEL: "debug"
+  
+  # Многострочное значение (используется pipe "|")
+  CONFIG_JSON: |
+    {
+      "server": "api.example.com",
+      "port": 8080,
+      "timeout": 30
+    }
+
+  # Ключ с именем файла (значение будет аналогично файлу)
+  default.conf: |
+    server {
+      listen 8000;
+      server_name homework.otus;
+      root /homework;
+
+      # Обработка корня
+      location = / {
+          try_files /index.html =404;
+      }
+
+      location = /conf/file {
+        default_type text/plain;
+        add_header Content-Type text/plain;
+        try_files /config =404;
+      }
+
+      # Обработка index.html
+      location = /index.html {
+          try_files /index.html =404;
+      }
+
+      # Редирект homepage
+      location = /homepage {
+          return 301 /;
+      }
+
+      # Все остальные пути
+      location / {
+          return 404;
+      }
+
+      error_page 404 /404.html;
+      error_page 500 502 503 504 /50x.html;
+    }
+  config: |
+    myconfig data ....

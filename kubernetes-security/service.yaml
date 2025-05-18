@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: homework
+  name: homework-service
+spec:
+  selector:
+    homework: kubernetes-networks
+  ports:
+    - name: http-access-port
+      protocol: TCP
+      port: 80
+      targetPort: http-web-svc
