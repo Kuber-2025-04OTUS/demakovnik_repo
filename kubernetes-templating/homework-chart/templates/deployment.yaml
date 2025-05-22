@@ -1,0 +1,77 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  {{- if .Release.Namespace }}
+  namespace: {{ .Release.Namespace }}
+  {{- end }}
+  name: {{ .Values.deployment.name }}
+  labels:
+    {{ .Values.global.homeworkLabel }}: {{ .Values.deployment.name }}
+spec:
+  replicas: {{ .Values.deployment.replicas }}
+  strategy:
+    {{- toYaml .Values.deployment.strategy | nindent 4 }}
+  selector:
+    matchLabels:
+      {{ .Values.global.homeworkLabel }}: {{ .Values.deployment.name }}
+  template:
+    metadata:
+      labels:
+        {{ .Values.global.homeworkLabel }}: {{ .Values.deployment.name }}
+    spec:
+      nodeSelector:
+        {{- toYaml .Values.deployment.nodeSelector | nindent 8 }}
+      containers:
+      - name: {{ .Values.deployment.webServer.name }}
+        image: "{{ .Values.deployment.webServer.image.repository }}:{{ .Values.deployment.webServer.image.tag }}"
+        ports:
+        - containerPort: {{ .Values.deployment.webServer.port }}
+          name: {{ .Values.deployment.webServer.portName }}
+        command: {{ .Values.deployment.webServer.command | toJson }}
+        args: {{ .Values.deployment.webServer.args | toJson }}
+        volumeMounts:
+        - name: nginx-config
+          mountPath: /etc/nginx/conf.d/default.conf
+          subPath: default.conf
+        - name: webdir
+          mountPath: /homework
+        - name: homework-config
+          mountPath: /homework/config
+          subPath: config
+        {{- if .Values.deployment.webServer.lifecycle }}
+        lifecycle:
+          preStop:
+            exec:
+              command: 
+                - "/bin/sh"
+                - "-c"
+                - "rm -f /homework/index.html"
+        {{- end }}
+        {{- if .Values.deployment.webServer.probes.enabled }}
+        readinessProbe:
+          httpGet:
+            path: {{ .Values.deployment.webServer.probes.readiness.path }}
+            port: {{ .Values.deployment.webServer.probes.readiness.port }}
+          initialDelaySeconds: {{ .Values.deployment.webServer.probes.readiness.initialDelaySeconds }}
+          periodSeconds: {{ .Values.deployment.webServer.probes.readiness.periodSeconds }}
+          failureThreshold: {{ .Values.deployment.webServer.probes.readiness.failureThreshold }}
+        {{- end }}
+      initContainers:
+      - name: {{ .Values.deployment.initContainer.name }}
+        image: "{{ .Values.deployment.initContainer.image.repository }}:{{ .Values.deployment.initContainer.image.tag }}"
+        command: {{ .Values.deployment.initContainer.command | toJson }}
+        args:
+          - "echo \"Homework 3. Hostname: $(hostname)\" > /init/index.html"
+        volumeMounts:
+        - name: webdir
+          mountPath: /init
+      volumes:
+      - name: nginx-config
+        configMap:
+          name: {{ .Values.configmap.name }}
+      - name: homework-config
+        configMap:
+          name: {{ .Values.configmap.name }}
+      - name: webdir
+        persistentVolumeClaim:
+          claimName: {{ .Values.pvc.name }}

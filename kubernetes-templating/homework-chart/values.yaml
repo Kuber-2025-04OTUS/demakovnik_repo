@@ -1,0 +1,133 @@
+# Global settings
+global:
+  homeworkLabel: kubernetes-helm
+
+# ConfigMap settings
+configmap:
+  name: configmap-homework
+  data:
+    APP_COLOR: "blue"
+    APP_MODE: "production"
+    LOG_LEVEL: "debug"
+    CONFIG_JSON: |
+      {
+        "server": "api.example.com",
+        "port": 8080,
+        "timeout": 30
+      }
+    default.conf: |
+      server {
+        listen 8000;
+        server_name homework.otus;
+        root /homework;
+
+        location = / {
+            try_files /index.html =404;
+        }
+
+        location = /conf/file {
+          default_type text/plain;
+          add_header Content-Type text/plain;
+          try_files /config =404;
+        }
+
+        location = /index.html {
+            try_files /index.html =404;
+        }
+
+        location = /homepage {
+            return 301 /;
+        }
+
+        location / {
+            return 404;
+        }
+
+        error_page 404 /404.html;
+        error_page 500 502 503 504 /50x.html;
+      }
+    config: |
+      myconfig data ....
+
+# Deployment settings
+deployment:
+  name: kubernetes-networks
+  replicas: 3
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 1
+      maxSurge: 1
+  nodeSelector:
+    homework: "true"
+  webServer:
+    name: web-server
+    image:
+      repository: nginx
+      tag: 1.27.2
+    port: 8000
+    portName: http-web-svc
+    command: ["/bin/sh", "-c"]
+    args: ["exec nginx -g 'daemon off;'"]
+    probes:
+      enabled: true
+      readiness:
+        path: /index.html
+        port: 8000
+        initialDelaySeconds: 10
+        periodSeconds: 10
+        failureThreshold: 2
+    lifecycle:
+      enabled: true
+      preStop:
+        exec:
+          command: ["/bin/sh", "-c", "rm -f /homework/index.html"]
+  initContainer:
+    name: init
+    image:
+      repository: busybox
+      tag: 1.36
+    command: ["/bin/sh", "-c"]
+    args: ["echo \"Homework 3. Hostname: $(hostname)\" > /init/index.html"]
+
+# PVC settings
+pvc:
+  name: pvc-homework
+  accessModes:
+    - ReadWriteOnce
+  storage: 1Gi
+  storageClassName: rke-hostpath-retain
+
+# StorageClass settings
+storageClass:
+  name: rke-hostpath-retain
+  isDefault: false
+  provisioner: driver.longhorn.io
+  reclaimPolicy: Retain
+  volumeBindingMode: Immediate
+
+# Service settings
+service:
+  name: homework-service
+  port: 80
+  targetPort: http-web-svc
+
+# Ingress settings
+ingress:
+  name: homework-ingress
+  enabled: true
+  className: nginx
+  host: homework.otus
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /$1
+    nginx.ingress.kubernetes.io/use-regex: "true"
+  paths:
+    - path: /(homepage|index\.html|conf\/file|^/|$)
+      pathType: ImplementationSpecific
+
+# Redis settings (dependency)
+redis:
+  enabled: true
+  architecture: standalone
+  auth:
+    enabled: false
