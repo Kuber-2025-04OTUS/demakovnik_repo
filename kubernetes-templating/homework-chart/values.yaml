@@ -1,6 +1,6 @@
 # Global settings
 global:
-  homeworkLabel: kubernetes-helm
+  homeworkLabel: kubernetes-templating
 
 # ConfigMap settings
 configmap:
@@ -51,7 +51,7 @@ configmap:
 
 # Deployment settings
 deployment:
-  name: kubernetes-networks
+  name: kubernetes-templating
   replicas: 3
   strategy:
     type: RollingUpdate
@@ -127,7 +127,7 @@ ingress:
 
 # Redis settings (dependency)
 redis:
-  enabled: true
+  enabled: false
   architecture: standalone
   auth:
     enabled: false
