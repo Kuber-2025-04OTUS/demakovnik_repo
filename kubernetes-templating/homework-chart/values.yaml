@@ -127,7 +127,7 @@ ingress:
 
 # Redis settings (dependency)
 redis:
-  enabled: false
+  enabled: true
   architecture: standalone
   auth:
     enabled: false
