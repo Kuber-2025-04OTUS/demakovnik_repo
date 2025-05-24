@@ -1,0 +1,15 @@
+*.swp
+*~
+*.bak
+*.tmp
+*.orig
+
+# Игнорировать IDE-специфичные файлы
+.idea/
+.vscode/
+*.code-workspace
+
+# Исключить локальные кэши Helm
+**/charts/
+**/tmp/
+**/requirements.lock
