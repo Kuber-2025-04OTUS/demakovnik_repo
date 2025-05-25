@@ -1,0 +1,61 @@
+repositories:
+  - name: bitnami
+    url: https://raw.githubusercontent.com/bitnami/charts/archive-full-index/bitnami
+
+releases:
+  # Продакшен конфигурация Kafka
+  - name: kafka-prod
+    namespace: prod
+    chart: bitnami/kafka
+    version: 25.3.5  # Актуальная версия чарта (не версия Kafka)
+    createNamespace: true
+    set:
+      - name: broker.replicaCount
+        value: 5
+      - name: controller.replicaCount
+        value: 1
+      - name: listeners.client.protocol
+        value: SASL_PLAINTEXT
+      - name: listeners.interBroker.protocol
+        value: SASL_PLAINTEXT
+      - name: pdb.persistence.enabled
+        value: true
+      - name: pdb.persistence.storageClass
+        value: longhorn
+      - name: pdb.persistence.size
+        value: 2Gi
+      - name: broker.persistence.enabled
+        value: true
+      - name: broker.persistence.storageClass
+        value: longhorn
+      - name: broker.persistence.size
+        value: 2Gi
+
+  # Dev конфигурация Kafka
+  - name: kafka-dev
+    namespace: dev
+    chart: bitnami/kafka
+    version: 32.2.8 # Актуальная версия чарта
+    createNamespace: true
+    set:
+      - name: broker.replicaCount
+        value: 1
+      - name: controller.replicaCount
+        value: 1
+      - name: listeners.client.protocol
+        value: PLAINTEXT
+      - name: listeners.interBroker.protocol
+        value: PLAINTEXT
+      - name: pdb.persistence.enabled
+        value: true
+      - name: pdb.persistence.storageClass
+        value: longhorn
+      - name: pdb.persistence.size
+        value: 2Gi
+      - name: broker.persistence.enabled
+        value: true
+      - name: broker.persistence.storageClass
+        value: longhorn
+      - name: broker.persistence.size
+        value: 2Gi
+      
