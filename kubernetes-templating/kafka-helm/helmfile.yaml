@@ -22,16 +22,12 @@ releases:
         value: true
       - name: pdb.persistence.storageClass
         value: longhorn
-      # - name: pdb.persistence.accessModes
-      #   value: "[ReadWriteOnce]"
       - name: pdb.persistence.size
         value: 2Gi
       - name: broker.persistence.enabled
         value: true
       - name: broker.persistence.storageClass
         value: longhorn
-      # - name: broker.persistence.accessModes
-      #   value: "[ReadWriteOnce]"
       - name: broker.persistence.size
         value: 2Gi
 
@@ -54,16 +50,12 @@ releases:
         value: true
       - name: pdb.persistence.storageClass
         value: longhorn
-      # - name: pdb.persistence.accessModes
-      #   value: "[ReadWriteOnce]"
       - name: pdb.persistence.size
         value: 2Gi
       - name: broker.persistence.enabled
         value: true
       - name: broker.persistence.storageClass
         value: longhorn
-      # - name: broker.persistence.accessModes
-      #   value: "[ReadWriteOnce]"
       - name: broker.persistence.size
         value: 2Gi
       
