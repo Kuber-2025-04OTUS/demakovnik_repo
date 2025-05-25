@@ -90,3 +90,9 @@ helm install kafka-prod bitnami/kafka --version 25.3.5 -n prod -f kafka-values-d
 ```
 
 ### Описать 2 предыдущих сценария установки в helmfile и приложить получившийся helmfile.yaml (и иные файлы, если они будут)
+
+Для использования helmfile, нужно запустить команду:
+```bash
+helmfile -f kafka-helm/helmfile.yaml -l name=kafka-prod sync
+```
+
