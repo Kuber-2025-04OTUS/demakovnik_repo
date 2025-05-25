@@ -96,15 +96,7 @@ pvc:
   accessModes:
     - ReadWriteOnce
   storage: 1Gi
-  storageClassName: rke-hostpath-retain
-
-# StorageClass settings
-storageClass:
-  name: rke-hostpath-retain
-  isDefault: false
-  provisioner: driver.longhorn.io
-  reclaimPolicy: Retain
-  volumeBindingMode: Immediate
+  storageClassName: longhorn 
 
 # Service settings
 service:
