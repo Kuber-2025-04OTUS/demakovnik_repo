@@ -34,16 +34,51 @@ helm install homework homework-chart -n homework --create-namespace
 ```
 
 
+## Установка Kafka из Bitnami Helm-чарта
+
+### Продакшен-конфигурация (prod)
+Релиз должен иметь следующие параметры:
+- Установлен в namespace `prod`
+- Должно быть развернуто 5 брокеров
+- Должна быть установлена Kafka версии 3.5.2
+- Для клиентских и межброкерных взаимодействий должен использоваться протокол `SASL_PLAINTEXT`
+
+
+Смотрим доступные чарты с нужной версией Kafka:
 ```bash
 helm search repo bitnami/kafka --versions
 ```
+Получаем файл с values версии `kafka 3.5.2`
 
 ```bash
 helm show values bitnami/kafka --version 25.3.5 > kafka-values-prod.yaml
 ```
+Устанавливаем в файле `kafka-values-prod.yaml` значения: `broker.replicaCount=5`, `listeners.client.protocol=SASL_PLAINTEXT`, `listeners.interBroker.protocol=SASL_PLAINTEXT`
 
+Далее, устанавливаем чарт с нужными переменными в namespace `prod`:
 ```bash
 helm install kafka-prod bitnami/kafka --version 25.3.5 -n prod -f kafka-values-prod.yaml --create-namespace
+```
+
+
+
+### Dev-конфигурация (dev)
+Релиз должен иметь следующие параметры:
+- Установлен в namespace `dev`
+- Должно быть развернут 1 брокер
+- Должна быть установлена последняя доступная версия Kafka
+- Для клиентских и межброкерных взаимодействий должен использоваться протокол `PLAINTEXT`
+- Авторизация для подключения к кластеру отключена
+
+Получаем файл с values последней версии `kafka`
+```bash
+helm show values bitnami/kafka > kafka-values-dev.yaml
+```
+Устанавливаем в файле `kafka-values-dev.yaml` значения: `broker.replicaCount=1`, `listeners.client.protocol=PLAINTEXT`, `listeners.interBroker.protocol=PLAINTEXT`
+
+Далее, устанавливаем чарт с нужными переменными в namespace `prod`:
+```bash
+helm install kafka-prod bitnami/kafka -n prod -f kafka-values-prod.yaml --create-namespace
 ```
 
 ```bash
