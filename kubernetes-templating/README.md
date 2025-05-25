@@ -87,3 +87,6 @@ helm show values bitnami/kafka --version 25.3.5 > kafka-values-dev.yaml
 
 ```bash
 helm install kafka-prod bitnami/kafka --version 25.3.5 -n prod -f kafka-values-dev.yaml --create-namespace
+```
+
+### Описать 2 предыдущих сценария установки в helmfile и приложить получившийся helmfile.yaml (и иные файлы, если они будут)
