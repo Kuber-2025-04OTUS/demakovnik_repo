@@ -36,6 +36,7 @@
 
 5. **Создать ServiceMonitor**  
    Создать манифест ServiceMonitor, описывающий сбор метрик с подов, которые вы создали.
+   
    Созданный файл: `nginx-manifests/nginx-servicemonitor.yaml` нужно задеплоить в кластер:
    ```bash
    kubectl apply -f nginx-manifests/nginx-servicemonitor.yaml -n homework
