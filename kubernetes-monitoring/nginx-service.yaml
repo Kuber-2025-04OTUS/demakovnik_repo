@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: nginx-with-metrics
+  labels:
+    app: nginx-with-metrics  # Должен совпадать с selector в ServiceMonitor
+spec:
+  selector:
+    app: nginx-with-metrics
+  ports:
+    - name: http-metrics  # Имя порта (строка!)
+      protocol: TCP
+      port: 80           # Порт сервиса
+      targetPort: 80      # Порт пода

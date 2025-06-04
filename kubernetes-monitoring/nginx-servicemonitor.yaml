@@ -1,0 +1,14 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: nginx-metrics
+  labels:
+    release: prometheus  # Должен совпадать с именем релиза Prometheus
+spec:
+  selector:
+    matchLabels:
+      app: nginx-with-metrics  # Совпадает с labels сервиса
+  endpoints:
+  - port: http-metrics  # Используем имя порта из Service!
+    path: /metrics
+    interval: 15s
