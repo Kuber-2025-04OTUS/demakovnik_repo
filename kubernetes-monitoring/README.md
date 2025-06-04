@@ -42,3 +42,9 @@
    ```bash
    kubectl apply -f nginx-manifests/nginx-servicemonitor.yaml -n homework
    ```
+
+Для того, чтобы узнать логин/пароль в grafana:
+```bash
+kubectl get secret prometheus-grafana -n monitoring -o jsonpath='{.data.admin-user}' | base64 --decode
+kubectl get secret prometheus-grafana -n monitoring -o jsonpath='{.data.admin-password}' | base64 --decode
+```
