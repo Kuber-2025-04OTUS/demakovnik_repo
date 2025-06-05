@@ -1,0 +1,29 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-with-metrics
+  labels:
+    app: nginx-with-metrics
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: nginx-with-metrics
+  template:
+    metadata:
+      labels:
+        app: nginx-with-metrics
+      annotations:
+        prometheus.io/scrape: "true"        # Включить сбор метрик
+        prometheus.io/path: "/metrics"     # Путь к метрикам
+        prometheus.io/port: "80"           # Порт (у нас метрики на :80/metrics)
+    spec:
+      containers:
+      - name: nginx
+        image: demakovnik/nginx-fixed:latest          # Ваш собранный образ
+        ports:
+        - containerPort: 80
+        resources:
+          limits:
+            memory: "128Mi"
+            cpu: "500m"
